@@ -1,0 +1,15 @@
+# Ignore the 'env' named folder and its contents
+env/
+
+# Ignore the 'reddit' named folder and its contents
+RedditPosts/
+# Ignore the '.env' named file
+.env
+
+# Ignore the 'tts_key.json' named file
+tts_key.json
+
+# Ignore the '__pycache__' named folder and its contents
+__pycache__/
+
+static/video/
