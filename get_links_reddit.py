@@ -145,6 +145,7 @@ def scrape(url, download_path, subreddit):
     finally:
         print(f"Finished running {subreddit[0]}")
 def run_1():
+    print('started 1')
     today = date.today().strftime("%Y-%m-%d")
     # today = "Custom"
     current_date = datetime.datetime.now()
@@ -154,40 +155,12 @@ def run_1():
     long_form_subreddits = ["nosleep"]
     # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6], ["confession", 2, 6],]
     subreddits = [
-        ["relationship_advice", 2, 6], ["relationships", 1, 6],
-        ["confessions", 2, 6], 
-        ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
-        ["tifu", 1, 6], ["legaladvice", 1, 6], 
-        ["AmItheAsshole", 3, 6], ["AITAH", 4, 6],  
-        ["askreddit", 4, 6]
-    ]
-
-    for subreddit in subreddits:
-        # if current_date.weekday() == subreddit[2]:
-        if True:
-            url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=week"
-            download_path = f"RedditPosts/{today}"
-            scrape(url, download_path, subreddit)
-
-    # Close the browser
-    delete_cache()
-    time.sleep(8)
-    driver.quit()
-if __name__ == "__main__":
-    today = date.today().strftime("%Y-%m-%d")
-    # today = "Custom"
-    current_date = datetime.datetime.now()
-
-    login()
-    time.sleep(2)
-    long_form_subreddits = ["nosleep"]
-    # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6], ["confession", 2, 6],]
-    subreddits = [
-        ["relationship_advice", 2, 6], ["relationships", 1, 6],
-        ["confessions", 2, 6], 
-        ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
-        ["tifu", 1, 6], ["legaladvice", 1, 6], 
-        ["AmItheAsshole", 3, 6], ["AITAH", 4, 6],  
+        ["relationship_advice", 2, 6]
+        # , ["relationships", 1, 6],
+        # ["confessions", 2, 6], 
+        # ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
+        # ["tifu", 1, 6], ["legaladvice", 1, 6], 
+        # ["AmItheAsshole", 3, 6], ["AITAH", 4, 6],  
         # ["askreddit", 4, 6]
     ]
 
@@ -201,4 +174,36 @@ if __name__ == "__main__":
     # Close the browser
     delete_cache()
     time.sleep(8)
+    driver.quit()
+    print('ended 1')
+
+if __name__ == "__main__":
+    today = date.today().strftime("%Y-%m-%d")
+    # today = "Custom"
+    current_date = datetime.datetime.now()
+
+    login()
+    time.sleep(2)
+    long_form_subreddits = ["nosleep"]
+    # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6], ["confession", 2, 6],]
+    subreddits = [
+        ["relationship_advice", 2, 6],
+        #   ["relationships", 1, 6],
+        # ["confessions", 2, 6], 
+        # ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
+        # ["tifu", 1, 6], ["legaladvice", 1, 6], 
+        # ["AmItheAsshole", 3, 6], ["AITAH", 4, 6],  
+        # ["askreddit", 4, 6]
+    ]
+
+    for subreddit in subreddits:
+        # if current_date.weekday() == subreddit[2]:
+        if True:
+            url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=week"
+            download_path = f"RedditPosts/{today}"
+            scrape(url, download_path, subreddit)
+
+    # Close the browser
+    delete_cache()
+    time.sleep(3)
     driver.quit()

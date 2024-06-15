@@ -16,7 +16,7 @@ TIKTOK_QUEUE = []
 YOUTUBE_SHORTS_QUEUE = []
 
 
-def randomVideoSegment(output_video_filepath, duration, background="minecraft"):
+def randomVideoSegment(output_video_filepath, duration, background="subway"):
     total_duration_seconds = 30 * 60
     background_video_path = "static/video/minecraft.mp4"
 
@@ -24,29 +24,38 @@ def randomVideoSegment(output_video_filepath, duration, background="minecraft"):
         background_video_path = "static/video/minecraft.mp4"
         video_clip = VideoFileClip(background_video_path)
         duration_sec = video_clip.duration
-        minecraft_times = [int(duration_sec * i / 6) for i in range(7)]
+        minecraft_times = [int(duration_sec * i / 7) for i in range(8)]
 
         # minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 51*60+54]
-        rand_background = random.randint(1, 6)
-        total_duration_seconds = minecraft_times[rand_background - 1]
-        background_video_path = f"static/video/minecraft/minecraft{rand_background}.mp4"
+        rand_background = random.randint(1, 7)
+        # total_duration_seconds = minecraft_times[rand_background - 1]
+        background_video_path = f"static/video/minecraft/minecraft_{rand_background}.mp4"
+        video_clip = VideoFileClip(background_video_path)
+        total_duration_seconds = video_clip.duration
     elif background == "subway":
         background_video_path = "static/video/subway.mp4"
+        video_clip = VideoFileClip(background_video_path)
+        duration_sec = video_clip.duration
         subway_times = [int(duration_sec * i / 6) for i in range(7)]
 
         # minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 51*60+54]
         rand_background = random.randint(1, 6)
-        total_duration_seconds = subway_times[rand_background - 1]
-        background_video_path = f"static/video/subway/subway{rand_background}.mp4"
+        # total_duration_seconds = subway_times[rand_background - 1]
+        background_video_path = f"static/video/subway/subway_{rand_background}.mp4"
+        video_clip = VideoFileClip(background_video_path)
+        total_duration_seconds = video_clip.duration
     elif background == "gta":
         background_video_path = "static/video/gta.mp4"
+        video_clip = VideoFileClip(background_video_path)
+        duration_sec = video_clip.duration
         gta_times = [int(duration_sec * i / 4) for i in range(5)]
 
         # minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 51*60+54]
         rand_background = random.randint(1, 4)
-        total_duration_seconds = gta_times[rand_background - 1]
-        background_video_path = f"static/video/gta/gta{rand_background}.mp4"
-
+        # total_duration_seconds = gta_times[rand_background - 1]
+        background_video_path = f"static/video/gta/gta_{rand_background}.mp4"
+        video_clip = VideoFileClip(background_video_path)
+        total_duration_seconds = video_clip.duration
     # dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     # if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
     #     background_video_path = "static/video/nighttime_minecraft_parkour.mp4"
@@ -71,7 +80,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     partNum = 0 
     wav_duration = get_wav_length(wav_file_path)
 
-    video_title_path = f"{mp4_file_path.split('.')[0]}/videoTitle.txt"
+    video_title_path = f"{video_path.split('.')[0]}/videoTitle.txt"
     video_title = "Errors Reading From Title"
     with open(video_title_path, 'r', encoding='utf-8') as file:
         video_title = file.read().strip()
@@ -300,11 +309,12 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
 if __name__ == "__main__":
     # today = date.today().strftime("%Y-%m-%d")
-    today = "2024-06-10"
+    today = "2024-06-16"
     # today = "Custom"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     # for subreddit in os.listdir(folder_path):
+    #     # print('i')
     #     post_path = f"{folder_path}/{subreddit}"
     #     for post in os.listdir(post_path):
     #         if post.endswith(".wav") and not post.endswith("title.wav"):
@@ -313,9 +323,13 @@ if __name__ == "__main__":
     #             output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
     #             duration = get_wav_length(wav_file_path)
     #             title_duration = get_wav_length(wav_title_file_path)
-    #             background = "minecraft" if subreddit == "askreddit" else "zachchoi"
+    #             print(wav_file_path)
+    #             print(wav_title_file_path)
+    #             print(output_video_path)
+                
+    #             background = 'minecraft'
     #             randomVideoSegment(output_video_path, duration + title_duration, background)
-    
+    print("hi")
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):

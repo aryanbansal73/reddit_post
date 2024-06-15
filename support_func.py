@@ -148,12 +148,11 @@ def adjust_mp4_volume(file_path, target_dB):
     video_clip.close()
     new_video_clip.close()
 def createTitleClip(wrappedText, start, duration):
-    width_x = 1080
-    height_y = 1920
-    textbox_size_x = 900
-    textbox_size_y = 600
-    center_x = width_x / 2 - textbox_size_x / 2
-    center_y = height_y / 2 - textbox_size_y / 2
+    width_x = 720
+    height_y = 1280
+    textbox_size_x = 640
+    textbox_size_y = 400
+
     font = "ARLRDBD.TTF"
     new_textclip = TextClip(
         wrappedText, 
@@ -161,38 +160,28 @@ def createTitleClip(wrappedText, start, duration):
         color='black', 
         bg_color='transparent',
         method='caption',
-        size=(820, None),
+        font=f"static/fonts/{font}",
+        size=(600, None),
         align='West',
-    ).set_start(start).set_duration(duration).resize(width=820).set_position(('center', 'center'))
-
+    ).set_start(start).set_duration(duration).resize(width=600).set_position(('center', 'center'))
     text_width, text_height = new_textclip.size
 
-    background_clip = TextClip(
-        "", 
-        fontsize=50, 
-        color='white', 
-        bg_color='white',
-        method='caption',
-        # font=f"static/fonts/{font}",
-        size=(900, text_height + 20),
-        align='West',
-    ).set_start(start).set_duration(duration).set_position(('center', 'center'))
+    background_image_path = 'static/images/medalled_banner_resized.png'
+    background_clip = ImageClip(background_image_path, duration=duration).resize((640, text_height + 20)).set_position(('center', 'center'))
 
     banner_path = 'static/images/medalled_banner_resized.png'
-    banner_clip = ImageClip(banner_path, duration=duration).resize(width=900)
-    banner_clip = banner_clip.set_pos((center_x, height_y / 2 - (text_height / 2) - banner_clip.size[1] - 10))
+    banner_clip = ImageClip(banner_path, duration=duration).resize(width=640).set_position(('center', 1280))
 
     comment_path = 'static/images/comments.png'
-    comment_clip = ImageClip(comment_path, duration=duration).resize(width=900)
-    comment_clip = comment_clip.set_pos((center_x, height_y / 2 + (text_height / 2) + 10))
+    comment_clip = ImageClip(comment_path, duration=duration).resize(width=640).set_position(('center', 1280))
 
     return background_clip, new_textclip, banner_clip, comment_clip
 
 def createTextClip(wrappedText, start, duration, color='white'):
-    width_x = 1080
-    height_y = 1920
-    textbox_size_x = 900
-    textbox_size_y = 600
+    width_x = 720
+    height_y = 1280
+    textbox_size_x = 640
+    textbox_size_y = 400
     center_x = width_x / 2 - textbox_size_x / 2
     center_y = height_y / 2 - textbox_size_y / 2
 
