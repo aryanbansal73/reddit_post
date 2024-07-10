@@ -181,7 +181,7 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
             cleaned_post = replaceProfanity(entire_post)
             # title = cleaned_post[0]
             title = cleaned_post.split('\n')[0]
-            print(title)
+            # print(title)
             file.write(cleaned_post)
         
         subreddits[subreddit] -= 1

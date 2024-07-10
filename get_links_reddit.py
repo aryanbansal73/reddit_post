@@ -156,7 +156,7 @@ def run_1():
     # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6], ["confession", 2, 6],]
     subreddits = [
         ["relationship_advice", 2, 6]
-        # , ["relationships", 1, 6],
+        , ["relationships", 1, 6],
         # ["confessions", 2, 6], 
         # ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
         # ["tifu", 1, 6], ["legaladvice", 1, 6], 

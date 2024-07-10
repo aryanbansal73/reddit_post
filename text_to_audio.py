@@ -17,7 +17,7 @@ def synth_speech(text, output_file):
     
     # Build the voice request, select the language code and the voice name
     voice = texttospeech.VoiceSelectionParams(
-        language_code="en-US"
+        language_code="en-US",name = "en-US-Standard-J"
     )
     
     # Select the type of audio file you want returned

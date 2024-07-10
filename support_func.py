@@ -148,10 +148,10 @@ def adjust_mp4_volume(file_path, target_dB):
     video_clip.close()
     new_video_clip.close()
 def createTitleClip(wrappedText, start, duration):
-    width_x = 720
-    height_y = 1280
-    textbox_size_x = 640
-    textbox_size_y = 400
+    width_x = 1080
+    height_y = 1920
+    textbox_size_x = 900
+    textbox_size_y = 600
 
     font = "ARLRDBD.TTF"
     new_textclip = TextClip(
@@ -161,27 +161,27 @@ def createTitleClip(wrappedText, start, duration):
         bg_color='transparent',
         method='caption',
         font=f"static/fonts/{font}",
-        size=(600, None),
+        size=(820, None),
         align='West',
-    ).set_start(start).set_duration(duration).resize(width=600).set_position(('center', 'center'))
+    ).set_start(start).set_duration(duration).resize(width=750).set_position(('center', 'center'))
     text_width, text_height = new_textclip.size
 
     background_image_path = 'static/images/medalled_banner_resized.png'
-    background_clip = ImageClip(background_image_path, duration=duration).resize((640, text_height + 20)).set_position(('center', 'center'))
+    background_clip = ImageClip(background_image_path, duration=duration).resize((900, text_height + 300)).set_position(('center', 'center'))
 
     banner_path = 'static/images/medalled_banner_resized.png'
-    banner_clip = ImageClip(banner_path, duration=duration).resize(width=640).set_position(('center', 1280))
+    banner_clip = ImageClip(banner_path, duration=duration).resize(width=900).set_position(('center', 1280))
 
     comment_path = 'static/images/comments.png'
-    comment_clip = ImageClip(comment_path, duration=duration).resize(width=640).set_position(('center', 1280))
+    comment_clip = ImageClip(comment_path, duration=duration).resize(width=900).set_position(('center', 1280))
 
     return background_clip, new_textclip, banner_clip, comment_clip
 
 def createTextClip(wrappedText, start, duration, color='white'):
-    width_x = 720
-    height_y = 1280
-    textbox_size_x = 640
-    textbox_size_y = 400
+    width_x = 1080
+    height_y = 1920
+    textbox_size_x = 900
+    textbox_size_y = 600
     center_x = width_x / 2 - textbox_size_x / 2
     center_y = height_y / 2 - textbox_size_y / 2
 

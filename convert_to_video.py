@@ -67,7 +67,8 @@ def randomVideoSegment(output_video_filepath, duration, background="subway"):
     random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, preset='ultrafast', logger=None)
     print(f"Snipped {duration} s length video starting at: {random_start_time_seconds} for {output_video_filepath.split('/')[-1]}")
 
-
+def make_video(wav_file_path, wav_title_file_path, video_path, post_path, postName):
+    h
 def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postName):
     global INSTAGRAM_REELS_QUEUE
     global YOUTUBE_SHORTS_QUEUE
@@ -309,7 +310,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
 if __name__ == "__main__":
     # today = date.today().strftime("%Y-%m-%d")
-    today = "2024-06-16"
+    today = "2024-06-18"
     # today = "Custom"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
