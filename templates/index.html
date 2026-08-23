@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if not online %}
+  <p class="alert">The render worker is offline, so jobs cannot be queued right now.
+  Start it with <code>python worker.py</code>.</p>
+{% endif %}
+
+<section class="card">
+  <h1>Turn a Reddit post into a short</h1>
+  <p class="sub">Paste a self-post URL. It gets narrated, captioned and cut into
+  vertical parts under a minute each.</p>
+
+  <form method="post" action="{{ url_for('submit') }}">
+    <label for="url">Reddit post URL</label>
+    <input id="url" name="url" type="url" required
+           placeholder="https://www.reddit.com/r/tifu/comments/..." {% if not online %}disabled{% endif %}>
+
+    <label for="background">Background footage</label>
+    <select id="background" name="background" {% if not online %}disabled{% endif %}>
+      {% for name in backgrounds %}
+        <option value="{{ name }}">{{ name }}</option>
+      {% else %}
+        <option value="">none uploaded yet</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" {% if not online or not backgrounds %}disabled{% endif %}>Render</button>
+    {% if online and not backgrounds %}
+      <p class="hint">Upload footage to the worker first:
+      <code>curl -H "Authorization: Bearer $WORKER_TOKEN" -F file=@gameplay.mp4 $WORKER_URL/backgrounds</code></p>
+    {% endif %}
+  </form>
+</section>
+
+<section class="card">
+  <h2>Daily batch</h2>
+  <p class="sub">Grab this week's top posts across several subreddits in one run.
+  Vercel Cron fires this automatically; the button runs it now.</p>
+  <form method="post" action="{{ url_for('submit_batch') }}">
+    <label for="subreddits">Subreddits <span class="muted">(comma separated, blank uses the default set)</span></label>
+    <input id="subreddits" name="subreddits" type="text" placeholder="tifu, AmItheAsshole, relationship_advice"
+           {% if not online %}disabled{% endif %}>
+    <label for="bg2">Background footage</label>
+    <select id="bg2" name="background" {% if not online %}disabled{% endif %}>
+      {% for name in backgrounds %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="secondary" {% if not online or not backgrounds %}disabled{% endif %}>Run batch now</button>
+  </form>
+</section>
+
+{% endblock %}

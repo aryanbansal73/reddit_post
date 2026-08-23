@@ -1,0 +1,5 @@
+# Vercel web app only. Keep this minimal -- everything heavy lives on the
+# worker (see requirements-worker.txt) because Vercel functions cannot encode
+# video: read-only filesystem, 4.5 MB request bodies, hard execution timeout.
+flask>=3.0
+requests>=2.32
