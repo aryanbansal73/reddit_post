@@ -15,11 +15,11 @@ bodies, a hard execution timeout, and a bundle limit that PyTorch alone would
 blow. So the work is split:
 
 ```
-  yourdomain.com          Vercel        app.py      UI + job control (flask + requests only)
+  brogrammerlabs.com      Vercel        app.py      UI + job control (flask + requests only)
         |
         |  HTTPS, bearer token
         v
-  worker.yourdomain.com   your Mac      worker.py   queue, TTS, ffmpeg, local disk
+  <domain>.ngrok-free.app your Mac      worker.py   queue, TTS, ffmpeg, local disk
                                         core/       the actual pipeline
 ```
 
@@ -30,7 +30,7 @@ status, and links to files the worker serves.
 ### Pipeline
 
 ```
-Reddit OAuth API  ->  clean text  ->  Piper TTS (per sentence)  ->  ASS subtitles  ->  ffmpeg
+Reddit Atom feed  ->  clean text  ->  Piper TTS (per sentence)  ->  ASS subtitles  ->  ffmpeg
                                           |                              |
                                     exact durations  ------------->  caption timings
 ```
@@ -49,10 +49,27 @@ service itself, and even the interpolation goes away.
 
 ## Setup
 
-### 1. Reddit API credentials
+### 1. Reddit — nothing to do
 
-Create a free **script** app at <https://www.reddit.com/prefs/apps>. You need
-the client id and secret — no username or password, and no browser automation.
+There are no Reddit credentials. Content comes from the public Atom feeds:
+
+```
+/r/<sub>/top/.rss?t=week    listing, each entry carries the full self-text
+<permalink>/.rss            entry[0] is the post, entries[1:] are the comments
+```
+
+**Why not the OAuth API?** As of 2026 Reddit gates new Data API apps behind a
+request form that names a *moderation* use case, and `prefs/apps` will not
+self-serve a script app for anything else. Unauthenticated `.json` endpoints
+return `403`. The `.rss` feeds still serve publicly and carry everything this
+pipeline needs, so the project runs with no client id, no secret and no app.
+
+What that costs: no scores, no NSFW/stickied flags, and comment ordering is
+whatever the feed gives. Posts are filtered on length and title alone.
+
+Reddit throttles the feeds hard. `REDDIT_MIN_INTERVAL` (default 3s) spaces
+requests, and a `429` triggers an exponential backoff that honours
+`Retry-After`. A daily batch over three subreddits takes about a minute.
 
 ### 2. ffmpeg with libass
 
@@ -166,7 +183,7 @@ Vercel auto-detects `app.py` and its top-level `app`. Set these project env vars
 
 | Variable | Value |
 |---|---|
-| `WORKER_URL` | `https://worker.yourdomain.com` |
+| `WORKER_URL` | your ngrok domain, e.g. `https://xxxx.ngrok-free.app` |
 | `WORKER_TOKEN` | same value as the worker's |
 | `CRON_SECRET` | any long random string |
 
@@ -193,6 +210,7 @@ likely to change:
 | Variable | Default | Notes |
 |---|---|---|
 | `TTS_BACKEND` | `piper` | or `edge` |
+| `REDDIT_MIN_INTERVAL` | `3.0` | seconds between feed requests |
 | `PIPER_VOICE` | `en_US-hfc_male-medium` | `python -m piper.download_voices` lists all |
 | `MAX_SHORT_SECONDS` | `59` | hard cap per part |
 | `DAILY_SUBREDDITS` | `relationship_advice,tifu,AmItheAsshole` | for the batch job |
@@ -219,7 +237,7 @@ it before you ship Piper inside anything you hand to someone else.
 ## Tests
 
 ```bash
-.venv/bin/python -m pytest tests/ -q         # 24 tests, no ffmpeg/network needed
+.venv/bin/python -m pytest tests/ -q         # 29 tests, no ffmpeg/network needed
 .venv/bin/python scripts/smoke_render.py     # full render, needs ffmpeg + voice
 ```
 
@@ -232,7 +250,7 @@ title lengths, asserting no part exceeds the cap and no part is a stub.
 
 | Removed | Replaced by | Why |
 |---|---|---|
-| Selenium + headless Chrome + Reddit password login (~400 lines) | `praw` over the OAuth API | The data is public over an API. No browser, no credentials, no obfuscated CSS class names, no ToS risk. |
+| Selenium + headless Chrome + Reddit password login (~400 lines) | public Atom feeds over `requests` + stdlib `xml.etree` | No browser, no credentials, no obfuscated CSS class names. OAuth was tried first but Reddit no longer issues Data API apps for this kind of use. |
 | `whisper_timestamped` + PyTorch | nothing | Timings are known at synthesis time. |
 | Google Cloud TTS | Piper | Offline, free, no key, no per-character billing. |
 | MoviePy + ImageMagick | ffmpeg + libass | One filter instead of a Python object per caption. Also removes a hardcoded `C:\Program Files\ImageMagick` path. |

@@ -2,9 +2,8 @@
 flask>=3.0
 requests>=2.32
 
-# Reddit over the official OAuth API -- replaces selenium + webdriver-manager
-# + fake-headers + beautifulsoup4.
-praw>=7.7
+# Reddit needs no client library: public Atom feeds over requests + stdlib
+# xml.etree. See the module docstring in core/reddit.py for why not OAuth.
 
 # Offline neural TTS. No API key, no quota, no per-character billing.
 piper-tts>=1.3

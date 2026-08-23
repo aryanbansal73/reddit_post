@@ -11,10 +11,13 @@ OUTPUT_DIR = DATA_DIR / "output"
 WORK_DIR = DATA_DIR / "work"
 DB_PATH = DATA_DIR / "jobs.db"
 
-# --- reddit (script-type OAuth app: https://reddit.com/prefs/apps) -----------
-REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID", "")
-REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET", "")
-REDDIT_USER_AGENT = os.environ.get("REDDIT_USER_AGENT", "reddit_post/2.0")
+# --- reddit (public Atom feeds; no credentials, see core/reddit.py) ----------
+REDDIT_USER_AGENT = os.environ.get(
+    "REDDIT_USER_AGENT", "brogrammerlabs-shorts/2.0 (personal project)"
+)
+# Reddit throttles hard on the feeds; keep requests politely spaced.
+REDDIT_MIN_INTERVAL = float(os.environ.get("REDDIT_MIN_INTERVAL", 3.0))
+REDDIT_BACKOFF_BASE = float(os.environ.get("REDDIT_BACKOFF_BASE", 10.0))
 
 # --- tts ---------------------------------------------------------------------
 TTS_BACKEND = os.environ.get("TTS_BACKEND", "piper")

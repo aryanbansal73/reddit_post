@@ -190,3 +190,69 @@ def test_title_normalisation_censors_and_punctuates():
     from core.reddit import _normalise_title
     assert _normalise_title("Damn me & you") == "Darn me and you."
     assert _normalise_title("Already ends?") == "Already ends?"
+
+
+# --- reddit feed parsing (offline) ------------------------------------------
+
+from core import reddit as _reddit  # noqa: E402
+
+_FEED = """<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <link href="https://www.reddit.com/r/tifu/comments/abc123/some_slug/"/>
+    <title>TIFU by testing &amp; parsing</title>
+    <content type="html">&lt;div&gt;&lt;p&gt;First para.&lt;/p&gt;&lt;p&gt;Second &lt;a href="http://x.co"&gt;para&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;</content>
+  </entry>
+  <entry>
+    <link href="https://www.reddit.com/r/tifu/comments/abc123/some_slug/c1/"/>
+    <title>/u/someone on TIFU by testing</title>
+    <content type="html">&lt;p&gt;A comment long enough to survive the sixty character minimum filter here.&lt;/p&gt;</content>
+  </entry>
+</feed>"""
+
+
+def test_html_to_text_flattens_blocks_and_drops_tags():
+    text = _reddit._html_to_text(
+        "&lt;p&gt;One.&lt;/p&gt;&lt;p&gt;Two&lt;br/&gt;three.&lt;/p&gt;"
+    )
+    assert "<" not in text and ">" not in text
+    assert "One." in text and "Two" in text and "three." in text
+
+
+def test_post_id_and_subreddit_from_permalink():
+    url = "https://www.reddit.com/r/AmItheAsshole/comments/1vu4oua/some_slug/"
+    assert _reddit._post_id(url) == "1vu4oua"
+    assert _reddit._subreddit_of(url) == "AmItheAsshole"
+
+
+def test_feed_entry_yields_title_and_body(monkeypatch):
+    monkeypatch.setattr(_reddit, "_get", lambda url, attempts=5: _FEED)
+    post = _reddit.fetch_post("https://www.reddit.com/r/tifu/comments/abc123/some_slug/")
+    assert post.id == "abc123"
+    assert post.subreddit == "tifu"
+    assert post.title == "TIFU by testing and parsing."   # & expanded, punctuated
+    assert "First para." in post.body and "Second" in post.body
+    assert "http" not in post.body                        # link stripped by clean_body
+
+
+def test_comments_are_collected_when_asked(monkeypatch):
+    monkeypatch.setattr(_reddit, "_get", lambda url, attempts=5: _FEED)
+    post = _reddit.fetch_post("https://reddit.com/r/tifu/comments/abc123/s/", want_comments=True)
+    assert len(post.comments) == 1
+    assert post.narration == post.comments[0]             # comments win over body
+
+
+def test_get_raises_a_useful_error_on_rate_limit(monkeypatch):
+    class Resp:
+        status_code = 429
+        headers: dict = {}
+        text = ""
+
+    monkeypatch.setattr(_reddit.requests, "get", lambda *a, **k: Resp())
+    monkeypatch.setattr(_reddit.time, "sleep", lambda s: None)
+    try:
+        _reddit._get("https://example.com/x.rss", attempts=2)
+    except _reddit.RedditError as exc:
+        assert "rate limited" in str(exc)
+        return
+    raise AssertionError("expected RedditError on 429")
