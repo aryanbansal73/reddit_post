@@ -124,19 +124,37 @@ Check it end to end without touching Reddit:
 
 ### Expose the worker
 
-Vercel needs to reach your machine. A Cloudflare Tunnel is free and gives you a
-subdomain on the domain you already own:
+Vercel needs to reach your machine, and the worker needs a URL that does not
+change every restart (it is stored as `WORKER_URL` in Vercel's env).
+
+**ngrok** (free plan gives one assigned dev domain):
 
 ```bash
-brew install cloudflared
-cloudflared tunnel login
-cloudflared tunnel create reddit-worker
-cloudflared tunnel route dns reddit-worker worker.yourdomain.com
-cloudflared tunnel run --url http://localhost:8000 reddit-worker
+brew install ngrok
+ngrok config add-authtoken <token from dashboard.ngrok.com>
+ngrok http 8000 --url <your-assigned-domain>.ngrok-free.app
 ```
 
-For a quick test without DNS setup, `cloudflared tunnel --url http://localhost:8000`
-prints a temporary `*.trycloudflare.com` URL.
+Then set `WORKER_URL` on Vercel to `https://<your-assigned-domain>.ngrok-free.app`.
+
+Two free-plan limits worth knowing:
+
+- **Interstitial page.** ngrok shows a click-through warning on HTTP endpoints.
+  The web app sends `ngrok-skip-browser-warning` so the JSON API is unaffected,
+  but the *first* rendered-video link you open in a given browser will show it
+  once before ngrok sets its cookie.
+- **1 GB/month transfer.** Parts are 10–20 MB, so roughly 50–100 downloads a
+  month. Fine for personal use; it is the first thing you will outgrow.
+
+**Why not a Cloudflare named tunnel?** It needs the domain on Cloudflare's
+nameservers, and `brogrammerlabs.com` is on Squarespace DNS. A
+`*.cfargotunnel.com` CNAME only resolves behind Cloudflare's proxy, so it cannot
+be pointed at from third-party DNS. Moving nameservers to Cloudflare would work
+and would give you a real `worker.brogrammerlabs.com`, at the cost of
+re-creating the existing Vercel records there.
+
+**Tailscale Funnel** is the other free option with a stable URL and no
+interstitial or bandwidth cap, if ngrok's limits start to bite.
 
 ### Ship to Vercel
 

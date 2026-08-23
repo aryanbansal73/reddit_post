@@ -32,7 +32,12 @@ def worker(method: str, path: str, **kwargs):
         response = requests.request(
             method,
             f"{WORKER_URL}{path}",
-            headers={"Authorization": f"Bearer {WORKER_TOKEN}"},
+            headers={
+                "Authorization": f"Bearer {WORKER_TOKEN}",
+                # ngrok's free plan serves an HTML interstitial to browser-like
+                # requests; this header opts out so we get JSON back.
+                "ngrok-skip-browser-warning": "1",
+            },
             timeout=TIMEOUT,
             **kwargs,
         )
