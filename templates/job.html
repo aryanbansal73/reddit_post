@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Job <code>{{ job_id }}</code></h1>
+  <p id="status" class="status">checking…</p>
+  <p id="progress" class="sub"></p>
+  <div id="results"></div>
+</section>
+
+<script>
+const WORKER = {{ worker_url | tojson }};
+const JOB = {{ job_id | tojson }};
+const statusEl = document.getElementById('status');
+const progressEl = document.getElementById('progress');
+const resultsEl = document.getElementById('results');
+
+function renderResult(result) {
+  if (!result || !result.posts) return '';
+  return result.posts.map(post => {
+    if (post.error) {
+      return `<div class="result"><h3>${escapeHtml(post.title)}</h3>
+              <p class="alert">${escapeHtml(post.error)}</p></div>`;
+    }
+    const parts = (post.parts || []).map(part => `
+      <li>
+        <a href="${WORKER}/files/${encodeURIComponent(part.file)}">${escapeHtml(part.file)}</a>
+        <span class="muted">part ${part.part} of ${part.of} · ${part.seconds}s</span>
+      </li>`).join('');
+    return `<div class="result">
+              <h3><a href="${post.url}">${escapeHtml(post.title)}</a></h3>
+              <ul class="files">${parts}</ul>
+            </div>`;
+  }).join('');
+}
+
+function escapeHtml(value) {
+  const node = document.createElement('span');
+  node.textContent = value == null ? '' : String(value);
+  return node.innerHTML;
+}
+
+async function poll() {
+  try {
+    const response = await fetch(`/api/jobs/${JOB}`);
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const job = await response.json();
+
+    statusEl.textContent = job.status;
+    statusEl.className = `status ${job.status}`;
+    progressEl.textContent = job.progress || '';
+
+    if (job.status === 'done') {
+      resultsEl.innerHTML = renderResult(job.result);
+      return;
+    }
+    if (job.status === 'failed') {
+      resultsEl.innerHTML = `<p class="alert">${escapeHtml(job.error)}</p>`;
+      return;
+    }
+  } catch (err) {
+    statusEl.textContent = 'cannot reach the worker';
+    statusEl.className = 'status failed';
+  }
+  setTimeout(poll, 3000);
+}
+poll();
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Recent jobs</h1>
+  {% if not online %}
+    <p class="alert">Worker offline — this list is served from its database.</p>
+  {% elif not jobs %}
+    <p class="sub">Nothing rendered yet.</p>
+  {% else %}
+  <table>
+    <thead><tr><th>Job</th><th>Kind</th><th>Status</th><th>Output</th></tr></thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td><a href="{{ url_for('job_page', job_id=job.id) }}"><code>{{ job.id }}</code></a></td>
+        <td>{{ job.kind }}</td>
+        <td><span class="status {{ job.status }}">{{ job.status }}</span>
+            {% if job.progress %}<span class="muted"> {{ job.progress }}</span>{% endif %}</td>
+        <td>
+          {% for post in (job.result.posts if job.result else []) %}
+            {% for part in post.parts or [] %}
+              <a href="{{ worker_url }}/files/{{ part.file }}">{{ part.file }}</a><br>
+            {% endfor %}
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endblock %}
